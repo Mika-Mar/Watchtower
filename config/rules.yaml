@@ -1,0 +1,17 @@
+pokemon:
+  locations:
+    allow:
+      - global
+      - europe
+      - germany
+
+  games:
+    deny:
+      - pokemon go
+
+  types:
+    allow:
+      - serial code
+      - internet
+      - home
+      - in-life

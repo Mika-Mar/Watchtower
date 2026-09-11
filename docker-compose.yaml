@@ -1,0 +1,9 @@
+services:
+  watchtower:
+    build: .
+    container_name: watchtower
+    restart: "no"
+
+    volumes:
+      - ./data:/app/data
+      - ./config:/app/config
