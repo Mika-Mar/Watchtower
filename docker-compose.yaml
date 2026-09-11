@@ -5,7 +5,7 @@ services:
     restart: "no"
 
     environment:
-      BARK_DEVICE_KEY: ${BARK_DEVICE_KEY:Un9oj5TwP2Rk3zk3WcFCFY}
+      BARK_DEVICE_KEY: ${BARK_DEVICE_KEY:?Set BARK_DEVICE_KEY in .env}
       BARK_SERVER: ${BARK_SERVER:-https://api.day.app}
 
     volumes:
