@@ -1,5 +1,11 @@
+import os
+from pathlib import Path
+
+from dotenv import load_dotenv
+
 from app.collectors.serebii import SerebiiCollector
-from app.notifiers.ntfy import NtfyNotifier
+from app.notifiers.bark import BarkNotifier
+from app.processors.pokemon_enricher import enrich_pokemon
 from app.processors.relevance import load_rules, is_relevant
 from app.storage import (
     init_db,
@@ -13,11 +19,13 @@ from app.storage import (
 
 
 def main():
+    load_dotenv(Path(__file__).resolve().parent / ".env")
+    notifier = BarkNotifier(
+        device_key=os.environ.get("BARK_DEVICE_KEY", ""),
+        server=os.environ.get("BARK_SERVER", "https://api.day.app"),
+    )
     init_db()
     rules = load_rules()
-    notifier = NtfyNotifier(
-        topic="watchtower-pokemon-8f3d91a72c"
-    )
 
     collectors = [
         SerebiiCollector(),
@@ -32,6 +40,7 @@ def main():
         items = collector.fetch()
 
         for item in items:
+            item = enrich_pokemon(item)
             old_hash = get_item_hash(item.id)
             new_hash = content_hash(item)
 

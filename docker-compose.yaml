@@ -4,6 +4,10 @@ services:
     container_name: watchtower
     restart: "no"
 
+    environment:
+      BARK_DEVICE_KEY: ${BARK_DEVICE_KEY:Un9oj5TwP2Rk3zk3WcFCFY}
+      BARK_SERVER: ${BARK_SERVER:-https://api.day.app}
+
     volumes:
       - ./data:/app/data
       - ./config:/app/config
