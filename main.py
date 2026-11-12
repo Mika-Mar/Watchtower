@@ -5,6 +5,8 @@ from dotenv import load_dotenv
 
 from app.collectors.serebii import SerebiiCollector
 from app.notifiers.bark import BarkNotifier
+from app.notifiers.group import NotificationGroup
+from app.notifiers.ntfy import NtfyNotifier
 from app.processors.pokemon_enricher import enrich_pokemon
 from app.processors.relevance import load_rules, is_relevant
 from app.storage import (
@@ -20,10 +22,18 @@ from app.storage import (
 
 def main():
     load_dotenv(Path(__file__).resolve().parent / ".env")
-    notifier = BarkNotifier(
+    bark = BarkNotifier(
         device_key=os.environ.get("BARK_DEVICE_KEY", ""),
         server=os.environ.get("BARK_SERVER", "https://api.day.app"),
     )
+    notifiers = [bark]
+    if os.environ.get("NTFY_TOPIC", "").strip():
+        notifiers.append(NtfyNotifier(
+            topic=os.environ["NTFY_TOPIC"],
+            server=os.environ.get("NTFY_SERVER", "https://ntfy.sh"),
+            token=os.environ.get("NTFY_TOKEN", ""),
+        ))
+    notifier = NotificationGroup(notifiers)
     init_db()
     rules = load_rules()
 

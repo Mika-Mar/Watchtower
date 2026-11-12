@@ -7,6 +7,9 @@ services:
     environment:
       BARK_DEVICE_KEY: ${BARK_DEVICE_KEY:?Set BARK_DEVICE_KEY in .env}
       BARK_SERVER: ${BARK_SERVER:-https://api.day.app}
+      NTFY_TOPIC: ${NTFY_TOPIC:-}
+      NTFY_SERVER: ${NTFY_SERVER:-https://ntfy.sh}
+      NTFY_TOKEN: ${NTFY_TOKEN:-}
 
     volumes:
       - ./data:/app/data
