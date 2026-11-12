@@ -54,6 +54,35 @@ to the event. The first run imports existing events without sending notification
 later runs notify about relevant changes. Existing database history is preserved
 when switching notification services, so known events are not resent.
 
+## Test delivery on the Watchtower host
+
+After committing and pushing the changes from your development machine, run
+`git pull` in the project directory on the device that runs Watchtower. Configure
+`NTFY_TOPIC` (and optionally `NTFY_SERVER` and `NTFY_TOKEN`) in that device's
+`.env`; `.env` is excluded from Git. Subscribe to the same server and topic in
+the Android app and allow notifications.
+
+For Docker Compose, rebuild the image and send a test notification:
+
+```sh
+docker compose build watchtower
+docker compose run --rm watchtower python main.py --test-notification
+```
+
+For a Python installation, use the Python interpreter from the environment
+that runs Watchtower:
+
+```sh
+python main.py --test-notification
+```
+
+This sends a message containing `Watchtower test notification` to Bark and,
+when `NTFY_TOPIC` is set, ntfy. The command lists which services accepted the
+message; confirm that it appears on the phones too. The test exits before
+collecting events or accessing the database and works even before the first
+normal run. A delivery failure causes a nonzero exit code after attempting
+both configured services.
+
 ## Checks
 
 ```sh

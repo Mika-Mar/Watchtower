@@ -1,9 +1,11 @@
+import argparse
 import os
 from pathlib import Path
 
 from dotenv import load_dotenv
 
 from app.collectors.serebii import SerebiiCollector
+from app.models import Item
 from app.notifiers.bark import BarkNotifier
 from app.notifiers.group import NotificationGroup
 from app.notifiers.ntfy import NtfyNotifier
@@ -20,7 +22,7 @@ from app.storage import (
 )
 
 
-def main():
+def main(test_notification: bool = False):
     load_dotenv(Path(__file__).resolve().parent / ".env")
     bark = BarkNotifier(
         device_key=os.environ.get("BARK_DEVICE_KEY", ""),
@@ -34,6 +36,19 @@ def main():
             token=os.environ.get("NTFY_TOKEN", ""),
         ))
     notifier = NotificationGroup(notifiers)
+
+    if test_notification:
+        notifier.notify_new(Item(
+            id="watchtower-notification-test",
+            source="test",
+            category="pokemon_event",
+            title="Watchtower test notification",
+            metadata={"pokemon": "Pikachu", "location": "Test", "games": "Test"},
+        ))
+        destinations = "Bark, ntfy" if len(notifiers) > 1 else "Bark (ntfy is disabled)"
+        print(f"Test notification accepted by: {destinations}")
+        return
+
     init_db()
     rules = load_rules()
 
@@ -85,4 +100,11 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Watchtower Pokémon event notifications")
+    parser.add_argument(
+        "--test-notification",
+        action="store_true",
+        help="Send a test notification to configured Bark/ntfy recipients and exit.",
+    )
+    args = parser.parse_args()
+    main(test_notification=args.test_notification)
